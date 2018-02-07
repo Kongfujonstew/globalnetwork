@@ -1,0 +1,13 @@
+{
+  "presets": [
+    "babel-preset-react",
+    ["babel-preset-es2015", {"modules": false}]
+  ],
+  "env": {
+    "server": {
+      "plugins": [
+        "transform-es2015-modules-commonjs"
+      ]
+    }
+  }
+}
