@@ -1,10 +1,7 @@
-import React from 'react';
-import { withStyles } from 'material-ui/styles';
-import Paper from 'material-ui/Paper';
-import Typography from 'material-ui/Typography';
-import Avatar from 'material-ui/Avatar';
-import Chip from 'material-ui/Chip'
-import FaceIcon from 'material-ui-icons/Face';
+import React from 'react'
+import Paper from 'material-ui/Paper'
+import Typography from 'material-ui/Typography'
+import UserChip from './UserChip'
 
 const Users = (props) => {
   const { users, deleteUser } = props;
@@ -17,23 +14,7 @@ const Users = (props) => {
         <Typography component="p">
           Click on someone to delete them.
         </Typography>
-        {
-          users.map(user => {
-            return (
-              <Chip
-                avatar={
-                  <Avatar>
-                    <FaceIcon />
-                  </Avatar>
-                }
-                key={user.id}
-                label={user.name}
-                onClick={() => {}}
-                onDelete={() => deleteUser(user.id)}
-              />
-            )
-          })
-        }
+        { users.map(user => <UserChip key={user.id} deleteUser={deleteUser} user={user} />) }
       </Paper>
     </div>
   );

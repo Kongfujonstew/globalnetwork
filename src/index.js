@@ -6,9 +6,10 @@ import asyncActions from './axios'
 import { Chip } from 'material-ui/Chip'
 import theme from './theme'
 import Grid    from 'material-ui/Grid'
-import AppBar  from './components/AppBar'
-import Users from './components/Users'
-import NewUser from './components/NewUser'
+import AppBar   from './components/AppBar'
+import Users    from './components/Users'
+import NewUser  from './components/NewUser'
+import Rooms    from './components/Rooms'
 
 class Index extends React.Component {
   constructor(props) {
@@ -16,17 +17,17 @@ class Index extends React.Component {
     this.state = {
       user: {},
       users: [],
-      rooms: []
+      rooms: [{id:1, room:'Fun'}, {id:2, room:'Sports'}, {id:3, room:'Comedy'}, {id:4, room:'Travel'}]
     }
   }
 
   componentDidMount() {
     asyncActions.getUsers().then(users => this.setState({users: users.data}))
-    asyncActions.getRooms().then(rooms => this.setState({rooms: rooms.data}))
+    // asyncActions.getRooms().then(rooms => this.setState({rooms: rooms.data}))
   }
 
   parseUsers(usersArray) {
-    const others = usersArray.filter(user => !user.you)
+    const others = usersArray.filter(user => user.id !== this.state.user.id)
     this.setState({users: others})
   }
 
@@ -55,11 +56,27 @@ class Index extends React.Component {
       .catch(err => console.log('error: ', err))
   }
 
+  createRoom(name) {
+    console.log('createing room: ', name)
+    const rooms = this.state.rooms
+    rooms.push({id:Math.floor(Math.random()*1000), room:name})
+    this.setState({rooms})
+  }
+
+  addUserToRoom(userId, roomName) {
+
+  }
+
+  deleteUserFromRoom(userId, roomId) {
+
+  }
+
   logout() {
-    this.setState({user:{}})
+    location.reload()
   }
 
   render() {
+    console.log('user: ', this.state.user)
     return (
       <MuiThemeProvider theme={theme}>
         <main>
@@ -70,7 +87,7 @@ class Index extends React.Component {
           <Grid container>
             { this.state.user.isAuthenticated ?
               <Grid item sm={10}>
-                <NewUser title={'Welcome! Now you can create more users!!'} buttonText={'Make someone else'} createUser={this.makeUser.bind(this)}/>
+                <NewUser title={'Welcome ' + this.state.user.name + '! Now you can create more users!!'} buttonText={'Make someone else'} createUser={this.makeUser.bind(this)}/>
               </Grid> :
               <Grid item sm={10}>
                 <NewUser title={'Enter your name to sign up.'} buttonText={'Join Now'} createUser={this.createAndLoginUser.bind(this)}/>
@@ -82,6 +99,16 @@ class Index extends React.Component {
               <Users
                 deleteUser={this.deleteUser.bind(this)}
                 users={this.state.users}
+              />
+            </Grid>
+          </Grid>
+          <NewUser title={'Create a new group.'} buttonText={'Create group'} createUser={this.createRoom.bind(this)}/>
+          <Grid container>
+            <Grid item sm={10}>
+              <Rooms 
+                users={this.state.users}
+                rooms={this.state.rooms}
+                deleteUser={this.deleteUser.bind(this)}
               />
             </Grid>
           </Grid>

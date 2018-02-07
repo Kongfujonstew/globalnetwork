@@ -41,7 +41,7 @@ function MyAppBar(props) {
             >Logout</Button> :
             <Button 
               color="inherit"
-              onClick={() => alert('Please enter a name and press Join Now below')}
+              onClick={() => alert('Existing user login not implemented!  Please sign up and create a new user below')}
             >Login</Button>
           }
         </Toolbar>

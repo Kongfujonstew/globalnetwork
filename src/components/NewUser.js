@@ -21,10 +21,17 @@ class NewUser extends React.Component {
     this.setState({name:''  })
   }
 
+  handleKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      this.handleSubmit()
+    }
+  }
+
   render() {
     const { title, buttonText } = this.props
     return (
-      <Paper style={{marginTop:'18px'}} elevation={4}>
+      <Paper onKeyDown={this.handleKeyDown.bind(this)} style={{marginTop:'18px'}} elevation={4}>
         <Typography variant="headline" component="h3">
           { title }
         </Typography>

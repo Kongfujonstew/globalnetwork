@@ -7681,6 +7681,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__components_AppBar__ = __webpack_require__(344);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__components_Users__ = __webpack_require__(379);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__components_NewUser__ = __webpack_require__(382);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__components_Rooms__ = __webpack_require__(438);
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -7688,6 +7689,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 
 
 
@@ -7712,7 +7714,7 @@ var Index = function (_React$Component) {
     _this.state = {
       user: {},
       users: [],
-      rooms: []
+      rooms: [{ id: 1, room: 'Fun' }, { id: 2, room: 'Sports' }, { id: 3, room: 'Comedy' }, { id: 4, room: 'Travel' }]
     };
     return _this;
   }
@@ -7725,32 +7727,32 @@ var Index = function (_React$Component) {
       __WEBPACK_IMPORTED_MODULE_4__axios__["a" /* default */].getUsers().then(function (users) {
         return _this2.setState({ users: users.data });
       });
-      __WEBPACK_IMPORTED_MODULE_4__axios__["a" /* default */].getRooms().then(function (rooms) {
-        return _this2.setState({ rooms: rooms.data });
-      });
+      // asyncActions.getRooms().then(rooms => this.setState({rooms: rooms.data}))
     }
   }, {
     key: 'parseUsers',
     value: function parseUsers(usersArray) {
+      var _this3 = this;
+
       var others = usersArray.filter(function (user) {
-        return !user.you;
+        return user.id !== _this3.state.user.id;
       });
       this.setState({ users: others });
     }
   }, {
     key: 'createAndLoginUser',
     value: function createAndLoginUser(name) {
-      var _this3 = this;
+      var _this4 = this;
 
       __WEBPACK_IMPORTED_MODULE_4__axios__["a" /* default */].createAndLoginUser(name).then(function (users) {
-        if (!_this3.state.user.isAuthenticated) {
+        if (!_this4.state.user.isAuthenticated) {
           var you = users.data.filter(function (user) {
             return user.you;
           })[0];
           you.isAuthenticated = true;
-          _this3.setState({ user: you });
+          _this4.setState({ user: you });
         }
-        _this3.parseUsers(users.data);
+        _this4.parseUsers(users.data);
       }).catch(function (err) {
         return console.log('error: ', err);
       });
@@ -7758,10 +7760,10 @@ var Index = function (_React$Component) {
   }, {
     key: 'makeUser',
     value: function makeUser(name) {
-      var _this4 = this;
+      var _this5 = this;
 
       __WEBPACK_IMPORTED_MODULE_4__axios__["a" /* default */].makeUser(name).then(function (users) {
-        return _this4.parseUsers(users.data);
+        return _this5.parseUsers(users.data);
       }).catch(function (err) {
         return console.log('error: ', err);
       });
@@ -7769,22 +7771,37 @@ var Index = function (_React$Component) {
   }, {
     key: 'deleteUser',
     value: function deleteUser(id) {
-      var _this5 = this;
+      var _this6 = this;
 
       __WEBPACK_IMPORTED_MODULE_4__axios__["a" /* default */].deleteUser(id).then(function (users) {
-        return _this5.parseUsers(users.data);
+        return _this6.parseUsers(users.data);
       }).catch(function (err) {
         return console.log('error: ', err);
       });
     }
   }, {
+    key: 'createRoom',
+    value: function createRoom(name) {
+      console.log('createing room: ', name);
+      var rooms = this.state.rooms;
+      rooms.push({ id: Math.floor(Math.random() * 1000), room: name });
+      this.setState({ rooms: rooms });
+    }
+  }, {
+    key: 'addUserToRoom',
+    value: function addUserToRoom(userId, roomName) {}
+  }, {
+    key: 'deleteUserFromRoom',
+    value: function deleteUserFromRoom(userId, roomId) {}
+  }, {
     key: 'logout',
     value: function logout() {
-      this.setState({ user: {} });
+      location.reload();
     }
   }, {
     key: 'render',
     value: function render() {
+      console.log('user: ', this.state.user);
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         __WEBPACK_IMPORTED_MODULE_3_material_ui_styles__["MuiThemeProvider"],
         { theme: __WEBPACK_IMPORTED_MODULE_6__theme__["a" /* default */] },
@@ -7801,7 +7818,7 @@ var Index = function (_React$Component) {
             this.state.user.isAuthenticated ? __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               __WEBPACK_IMPORTED_MODULE_7_material_ui_Grid___default.a,
               { item: true, sm: 10 },
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_10__components_NewUser__["a" /* default */], { title: 'Welcome! Now you can create more users!!', buttonText: 'Make someone else', createUser: this.makeUser.bind(this) })
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_10__components_NewUser__["a" /* default */], { title: 'Welcome ' + this.state.user.name + '! Now you can create more users!!', buttonText: 'Make someone else', createUser: this.makeUser.bind(this) })
             ) : __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
               __WEBPACK_IMPORTED_MODULE_7_material_ui_Grid___default.a,
               { item: true, sm: 10 },
@@ -7817,6 +7834,20 @@ var Index = function (_React$Component) {
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__components_Users__["a" /* default */], {
                 deleteUser: this.deleteUser.bind(this),
                 users: this.state.users
+              })
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_10__components_NewUser__["a" /* default */], { title: 'Create a new group.', buttonText: 'Create group', createUser: this.createRoom.bind(this) }),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            __WEBPACK_IMPORTED_MODULE_7_material_ui_Grid___default.a,
+            { container: true },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              __WEBPACK_IMPORTED_MODULE_7_material_ui_Grid___default.a,
+              { item: true, sm: 10 },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_11__components_Rooms__["a" /* default */], {
+                users: this.state.users,
+                rooms: this.state.rooms,
+                deleteUser: this.deleteUser.bind(this)
               })
             )
           )
@@ -33668,21 +33699,29 @@ var deleteUser = function deleteUser(id) {
   });
 };
 
-var getRooms = function getRooms() {
-  return __WEBPACK_IMPORTED_MODULE_0_axios___default.a.get(url + 'rooms', {
-    headers: { 'Content-Type': 'application/json' }
-  }).then(function (rooms) {
-    return rooms;
-  }).catch(function (err) {
-    return console.log('err: ', err);
-  });
-};
+// const getRooms = () => {
+//   return axios.get(url + 'rooms' , {
+//     headers: { 'Content-Type': 'application/json' },
+//   })
+//     .then(rooms => rooms)
+//     .catch(err => console.log('err: ', err))
+// }
+
+// const createRoom = (name) => {
+//   return axios.post(url + 'rooms' , {
+//     headers: { 'Content-Type': 'application/json' },
+//     name
+//   })
+//     .then(rooms => rooms)
+//     .catch(err => console.log('err: ', err))
+// }
 
 /* harmony default export */ __webpack_exports__["a"] = ({
   createAndLoginUser: createAndLoginUser,
+  // createRoom,
   deleteUser: deleteUser,
   getUsers: getUsers,
-  getRooms: getRooms,
+  // getRooms,
   makeUser: makeUser
 });
 
@@ -37420,7 +37459,7 @@ function MyAppBar(props) {
           {
             color: 'inherit',
             onClick: function onClick() {
-              return alert('Please enter a name and press Join Now below');
+              return alert('Existing user login not implemented!  Please sign up and create a new user below');
             }
           },
           'Login'
@@ -40972,21 +41011,11 @@ exports.default = Menu;
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_material_ui_styles__ = __webpack_require__(70);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_material_ui_styles___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_material_ui_styles__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_material_ui_Paper__ = __webpack_require__(347);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_material_ui_Paper___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_material_ui_Paper__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_material_ui_Typography__ = __webpack_require__(351);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_material_ui_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_material_ui_Typography__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_material_ui_Avatar__ = __webpack_require__(380);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_material_ui_Avatar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_material_ui_Avatar__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_material_ui_Chip__ = __webpack_require__(316);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_material_ui_Chip___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_material_ui_Chip__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_material_ui_icons_Face__ = __webpack_require__(381);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_material_ui_icons_Face___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_material_ui_icons_Face__);
-
-
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_material_ui_Paper__ = __webpack_require__(347);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_material_ui_Paper___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_material_ui_Paper__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_material_ui_Typography__ = __webpack_require__(351);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_material_ui_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_material_ui_Typography__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__UserChip__ = __webpack_require__(445);
 
 
 
@@ -41000,32 +41029,20 @@ var Users = function Users(props) {
     'div',
     null,
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-      __WEBPACK_IMPORTED_MODULE_2_material_ui_Paper___default.a,
+      __WEBPACK_IMPORTED_MODULE_1_material_ui_Paper___default.a,
       { style: { marginTop: '18px' }, elevation: 4 },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        __WEBPACK_IMPORTED_MODULE_3_material_ui_Typography___default.a,
+        __WEBPACK_IMPORTED_MODULE_2_material_ui_Typography___default.a,
         { variant: 'headline', component: 'h3' },
         'Users'
       ),
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-        __WEBPACK_IMPORTED_MODULE_3_material_ui_Typography___default.a,
+        __WEBPACK_IMPORTED_MODULE_2_material_ui_Typography___default.a,
         { component: 'p' },
         'Click on someone to delete them.'
       ),
       users.map(function (user) {
-        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5_material_ui_Chip___default.a, {
-          avatar: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            __WEBPACK_IMPORTED_MODULE_4_material_ui_Avatar___default.a,
-            null,
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_6_material_ui_icons_Face___default.a, null)
-          ),
-          key: user.id,
-          label: user.name,
-          onClick: function onClick() {},
-          onDelete: function onDelete() {
-            return deleteUser(user.id);
-          }
-        });
+        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__UserChip__["a" /* default */], { key: user.id, deleteUser: deleteUser, user: user });
       })
     )
   );
@@ -41153,6 +41170,14 @@ var NewUser = function (_React$Component) {
       this.setState({ name: '' });
     }
   }, {
+    key: 'handleKeyDown',
+    value: function handleKeyDown(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        this.handleSubmit();
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _props = this.props,
@@ -41161,7 +41186,7 @@ var NewUser = function (_React$Component) {
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         __WEBPACK_IMPORTED_MODULE_2_material_ui_Paper___default.a,
-        { style: { marginTop: '18px' }, elevation: 4 },
+        { onKeyDown: this.handleKeyDown.bind(this), style: { marginTop: '18px' }, elevation: 4 },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           __WEBPACK_IMPORTED_MODULE_3_material_ui_Typography___default.a,
           { variant: 'headline', component: 'h3' },
@@ -49085,6 +49110,745 @@ ListSubheader.muiName = 'ListSubheader';
 
 exports.default = (0, _withStyles2.default)(styles, { name: 'MuiListSubheader' })(ListSubheader);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 438 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_material_ui_Card__ = __webpack_require__(439);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_material_ui_Card___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_material_ui_Card__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_material_ui_Button__ = __webpack_require__(353);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_material_ui_Button___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_material_ui_Button__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_material_ui_Paper__ = __webpack_require__(347);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_material_ui_Paper___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_material_ui_Paper__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography__ = __webpack_require__(351);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_material_ui_Typography__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__UserChip__ = __webpack_require__(445);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+
+
+
+
+
+
+
+var Rooms = function (_React$Component) {
+  _inherits(Rooms, _React$Component);
+
+  function Rooms() {
+    _classCallCheck(this, Rooms);
+
+    return _possibleConstructorReturn(this, (Rooms.__proto__ || Object.getPrototypeOf(Rooms)).apply(this, arguments));
+  }
+
+  _createClass(Rooms, [{
+    key: 'preventDefault',
+    value: function preventDefault(e) {
+      e.preventDefault();
+    }
+  }, {
+    key: 'handleDrop',
+    value: function handleDrop(e) {
+      var data = e.dataTransfer;
+      e.preventDefault();
+      console.log('d: ', data);
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      var _props = this.props,
+          rooms = _props.rooms,
+          deleteUser = _props.deleteUser;
+
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'div',
+        null,
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
+          { variant: 'display3', component: 'h2' },
+          'Rooms'
+        ),
+        rooms.map(function (room) {
+          var users = room.users || [];
+          return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            __WEBPACK_IMPORTED_MODULE_3_material_ui_Paper___default.a,
+            { style: { backgroundColor: 'lightblue', marginTop: '15px' }, key: room.id },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              __WEBPACK_IMPORTED_MODULE_1_material_ui_Card___default.a,
+              {
+                onDragOver: _this2.preventDefault,
+                onDrop: _this2.handleDrop
+              },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_1_material_ui_Card__["CardContent"],
+                null,
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
+                  { variant: 'headline', component: 'h2' },
+                  room.room
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
+                  { component: 'p' },
+                  'This is probably the best room in the platform.  But you\'ll never know until you see for yourself.'
+                )
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_1_material_ui_Card__["CardActions"],
+                null,
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_2_material_ui_Button___default.a,
+                  { size: 'small', color: 'primary' },
+                  'Join'
+                ),
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                  __WEBPACK_IMPORTED_MODULE_2_material_ui_Button___default.a,
+                  { size: 'small', color: 'primary' },
+                  'Learn More'
+                )
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
+                { component: 'p' },
+                'Members:'
+              ),
+              users.map(function (user) {
+                return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__UserChip__["a" /* default */], { key: user.id, deleteUser: deleteUser, user: user });
+              })
+            )
+          );
+        })
+      );
+    }
+  }]);
+
+  return Rooms;
+}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
+
+/* harmony default export */ __webpack_exports__["a"] = (Rooms);
+
+/***/ }),
+/* 439 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _Card = __webpack_require__(440);
+
+Object.defineProperty(exports, 'default', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_Card).default;
+  }
+});
+
+var _CardContent = __webpack_require__(441);
+
+Object.defineProperty(exports, 'CardContent', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_CardContent).default;
+  }
+});
+
+var _CardActions = __webpack_require__(442);
+
+Object.defineProperty(exports, 'CardActions', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_CardActions).default;
+  }
+});
+
+var _CardMedia = __webpack_require__(443);
+
+Object.defineProperty(exports, 'CardMedia', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_CardMedia).default;
+  }
+});
+
+var _CardHeader = __webpack_require__(444);
+
+Object.defineProperty(exports, 'CardHeader', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_CardHeader).default;
+  }
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 440 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__(4);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _objectWithoutProperties2 = __webpack_require__(5);
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(2);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _Paper = __webpack_require__(347);
+
+var _Paper2 = _interopRequireDefault(_Paper);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function Card(props) {
+  var raised = props.raised,
+      other = (0, _objectWithoutProperties3.default)(props, ['raised']);
+
+
+  return _react2.default.createElement(_Paper2.default, (0, _extends3.default)({ elevation: raised ? 8 : 2 }, other));
+} // @inheritedComponent Paper
+
+Card.propTypes = process.env.NODE_ENV !== "production" ? {
+  /**
+   * @ignore
+   */
+  className: _propTypes2.default.string,
+  /**
+   * If `true`, the card will use raised styling.
+   */
+  raised: _propTypes2.default.bool
+} : {};
+
+Card.defaultProps = {
+  raised: false
+};
+
+exports.default = Card;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 441 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.styles = undefined;
+
+var _extends2 = __webpack_require__(4);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _objectWithoutProperties2 = __webpack_require__(5);
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(2);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _classnames = __webpack_require__(10);
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var _withStyles = __webpack_require__(9);
+
+var _withStyles2 = _interopRequireDefault(_withStyles);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var styles = exports.styles = function styles(theme) {
+  return {
+    root: {
+      padding: theme.spacing.unit * 2,
+      '&:last-child': {
+        paddingBottom: theme.spacing.unit * 3
+      }
+    }
+  };
+};
+
+function CardContent(props) {
+  var classes = props.classes,
+      className = props.className,
+      Component = props.component,
+      other = (0, _objectWithoutProperties3.default)(props, ['classes', 'className', 'component']);
+
+
+  return _react2.default.createElement(Component, (0, _extends3.default)({ className: (0, _classnames2.default)(classes.root, className) }, other));
+}
+
+CardContent.propTypes = process.env.NODE_ENV !== "production" ? {
+  /**
+   * Useful to extend the style applied to components.
+   */
+  classes: _propTypes2.default.object.isRequired,
+  /**
+   * @ignore
+   */
+  className: _propTypes2.default.string,
+  /**
+   * The component used for the root node.
+   * Either a string to use a DOM element or a component.
+   */
+  component: _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.func])
+} : {};
+
+CardContent.defaultProps = {
+  component: 'div'
+};
+
+exports.default = (0, _withStyles2.default)(styles, { name: 'MuiCardContent' })(CardContent);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 442 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.styles = undefined;
+
+var _extends2 = __webpack_require__(4);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _objectWithoutProperties2 = __webpack_require__(5);
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(2);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _classnames = __webpack_require__(10);
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var _withStyles = __webpack_require__(9);
+
+var _withStyles2 = _interopRequireDefault(_withStyles);
+
+var _reactHelpers = __webpack_require__(96);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var styles = exports.styles = {
+  root: {
+    height: 52,
+    display: 'flex',
+    alignItems: 'center',
+    padding: '2px 4px',
+    boxSizing: 'border-box'
+  },
+  action: {
+    margin: '0 4px'
+  }
+};
+
+function CardActions(props) {
+  var disableActionSpacing = props.disableActionSpacing,
+      children = props.children,
+      classes = props.classes,
+      className = props.className,
+      other = (0, _objectWithoutProperties3.default)(props, ['disableActionSpacing', 'children', 'classes', 'className']);
+
+
+  return _react2.default.createElement(
+    'div',
+    (0, _extends3.default)({ className: (0, _classnames2.default)(classes.root, className) }, other),
+    disableActionSpacing ? children : (0, _reactHelpers.cloneChildrenWithClassName)(children, classes.action)
+  );
+}
+
+CardActions.propTypes = process.env.NODE_ENV !== "production" ? {
+  /**
+   * The content of the component.
+   */
+  children: _propTypes2.default.node,
+  /**
+   * Useful to extend the style applied to components.
+   */
+  classes: _propTypes2.default.object.isRequired,
+  /**
+   * @ignore
+   */
+  className: _propTypes2.default.string,
+  /**
+   * If `true`, the card actions do not have additional margin.
+   */
+  disableActionSpacing: _propTypes2.default.bool
+} : {};
+
+CardActions.defaultProps = {
+  disableActionSpacing: false
+};
+
+exports.default = (0, _withStyles2.default)(styles, { name: 'MuiCardActions' })(CardActions);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 443 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.styles = undefined;
+
+var _defineProperty2 = __webpack_require__(6);
+
+var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
+var _extends2 = __webpack_require__(4);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _objectWithoutProperties2 = __webpack_require__(5);
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(2);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _classnames = __webpack_require__(10);
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var _warning = __webpack_require__(3);
+
+var _warning2 = _interopRequireDefault(_warning);
+
+var _withStyles = __webpack_require__(9);
+
+var _withStyles2 = _interopRequireDefault(_withStyles);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var styles = exports.styles = {
+  root: {
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center'
+  },
+  rootMedia: {
+    width: '100%'
+  }
+};
+
+var MEDIA_COMPONENTS = ['video', 'audio', 'picture', 'iframe', 'img'];
+
+function CardMedia(props) {
+  var _classNames;
+
+  var classes = props.classes,
+      className = props.className,
+      Component = props.component,
+      image = props.image,
+      src = props.src,
+      style = props.style,
+      other = (0, _objectWithoutProperties3.default)(props, ['classes', 'className', 'component', 'image', 'src', 'style']);
+
+
+  process.env.NODE_ENV !== "production" ? (0, _warning2.default)(Boolean(image || src), 'Material-UI: either `image` or `src` property must be specified.') : void 0;
+
+  var isMediaComponent = MEDIA_COMPONENTS.indexOf(Component) !== -1;
+  var composedStyle = !isMediaComponent && image ? (0, _extends3.default)({ backgroundImage: 'url(' + image + ')' }, style) : style;
+  var composedClassName = (0, _classnames2.default)((_classNames = {}, (0, _defineProperty3.default)(_classNames, classes.root, !isMediaComponent), (0, _defineProperty3.default)(_classNames, classes.rootMedia, isMediaComponent), _classNames), className);
+
+  return _react2.default.createElement(Component, (0, _extends3.default)({
+    className: composedClassName,
+    style: composedStyle,
+    src: isMediaComponent ? image || src : undefined
+  }, other));
+}
+
+CardMedia.propTypes = process.env.NODE_ENV !== "production" ? {
+  /**
+   * Useful to extend the style applied to components.
+   */
+  classes: _propTypes2.default.object.isRequired,
+  /**
+   * @ignore
+   */
+  className: _propTypes2.default.string,
+  /**
+   * Component for rendering image.
+   * Either a string to use a DOM element or a component.
+   */
+  component: _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.func]),
+  /**
+   * Image to be displayed as a background image.
+   * Either `image` or `src` prop must be specified.
+   * Note that caller must specify height otherwise the image will not be visible.
+   */
+  image: _propTypes2.default.string,
+  /**
+   * An alias for `image` property.
+   * Available only with media components.
+   * Media components: `video`, `audio`, `picture`, `iframe`, `img`.
+   */
+  src: _propTypes2.default.string,
+  /**
+   * @ignore
+   */
+  style: _propTypes2.default.object
+} : {};
+
+CardMedia.defaultProps = {
+  component: 'div'
+};
+
+exports.default = (0, _withStyles2.default)(styles, { name: 'MuiCardMedia' })(CardMedia);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 444 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.styles = undefined;
+
+var _extends2 = __webpack_require__(4);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _objectWithoutProperties2 = __webpack_require__(5);
+
+var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(2);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _classnames = __webpack_require__(10);
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
+var _withStyles = __webpack_require__(9);
+
+var _withStyles2 = _interopRequireDefault(_withStyles);
+
+var _Typography = __webpack_require__(351);
+
+var _Typography2 = _interopRequireDefault(_Typography);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var styles = exports.styles = function styles(theme) {
+  return {
+    root: {
+      display: 'flex',
+      alignItems: 'center',
+      padding: theme.spacing.unit * 2
+    },
+    avatar: {
+      flex: '0 0 auto',
+      marginRight: theme.spacing.unit * 2
+    },
+    action: {
+      flex: '0 0 auto',
+      alignSelf: 'flex-start',
+      marginTop: theme.spacing.unit * -1,
+      marginRight: theme.spacing.unit * -2
+    },
+    content: {
+      flex: '1 1 auto'
+    },
+    title: {},
+    subheader: {}
+  };
+};
+
+function CardHeader(props) {
+  var action = props.action,
+      avatar = props.avatar,
+      classes = props.classes,
+      classNameProp = props.className,
+      Component = props.component,
+      subheader = props.subheader,
+      title = props.title,
+      other = (0, _objectWithoutProperties3.default)(props, ['action', 'avatar', 'classes', 'className', 'component', 'subheader', 'title']);
+
+
+  return _react2.default.createElement(
+    Component,
+    (0, _extends3.default)({ className: (0, _classnames2.default)(classes.root, classNameProp) }, other),
+    avatar && _react2.default.createElement(
+      'div',
+      { className: classes.avatar },
+      avatar
+    ),
+    _react2.default.createElement(
+      'div',
+      { className: classes.content },
+      _react2.default.createElement(
+        _Typography2.default,
+        {
+          variant: avatar ? 'body2' : 'headline',
+          component: 'span',
+          className: classes.title
+        },
+        title
+      ),
+      subheader && _react2.default.createElement(
+        _Typography2.default,
+        {
+          variant: avatar ? 'body2' : 'body1',
+          component: 'span',
+          color: 'textSecondary',
+          className: classes.subheader
+        },
+        subheader
+      )
+    ),
+    action && _react2.default.createElement(
+      'div',
+      { className: classes.action },
+      action
+    )
+  );
+}
+
+CardHeader.propTypes = process.env.NODE_ENV !== "production" ? {
+  /**
+   * The action to display in the card header.
+   */
+  action: _propTypes2.default.node,
+  /**
+   * The Avatar for the Card Header.
+   */
+  avatar: _propTypes2.default.node,
+  /**
+   * Useful to extend the style applied to components.
+   */
+  classes: _propTypes2.default.object.isRequired,
+  /**
+   * @ignore
+   */
+  className: _propTypes2.default.string,
+  /**
+   * The component used for the root node.
+   * Either a string to use a DOM element or a component.
+   */
+  component: _propTypes2.default.oneOfType([_propTypes2.default.string, _propTypes2.default.func]),
+  /**
+   * The content of the component.
+   */
+  subheader: _propTypes2.default.node,
+  /**
+   * The content of the Card Title.
+   */
+  title: _propTypes2.default.node
+} : {};
+
+CardHeader.defaultProps = {
+  component: 'div'
+};
+
+exports.default = (0, _withStyles2.default)(styles, { name: 'MuiCardHeader' })(CardHeader);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 445 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_material_ui_Avatar__ = __webpack_require__(380);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_material_ui_Avatar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_material_ui_Avatar__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_material_ui_Chip__ = __webpack_require__(316);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_material_ui_Chip___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_material_ui_Chip__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_material_ui_icons_Face__ = __webpack_require__(381);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_material_ui_icons_Face___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_material_ui_icons_Face__);
+
+
+
+
+
+var UserChip = function UserChip(props) {
+  var user = props.user,
+      deleteUser = props.deleteUser;
+
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_material_ui_Chip___default.a, {
+    avatar: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+      __WEBPACK_IMPORTED_MODULE_1_material_ui_Avatar___default.a,
+      null,
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3_material_ui_icons_Face___default.a, null)
+    ),
+    draggable: true,
+    label: user.name,
+    onClick: function onClick() {},
+    onDelete: function onDelete() {
+      return deleteUser(user.id);
+    }
+  });
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (UserChip);
 
 /***/ })
 /******/ ]);
