@@ -21,19 +21,17 @@ class Rooms extends React.Component {
   const { rooms, addYouToRoom, deleteUserFromRoom, deleteRoom, deleteUser, userDragStart, currentUserId } = this.props
     return (
       <div>
-        <Typography variant="display3" component="h2">
+        <Typography variant="display1" component="h2">
           Rooms
-        </Typography>
-        <Typography component="p" style={{color:'red'}}>
-          IMPORTANT: You must DRAG and DROP users into the rooms to add!
         </Typography>
         <Grid container>
         { rooms.map(room => {
           const users = room.users || []
           return (
             <Grid item style={{width: '50%'}} key={room.id}>
-              <Paper style={{backgroundColor: 'lightblue', marginTop: '15px'}}>
+              <Paper style={{backgroundColor: 'lightblue', marginTop: '15px', padding: '4px'}}>
                 <Card
+                  style={{padding: '8px', minHeight: '240px'}}
                   onDragOver={this.preventDefault}
                   onDrop={() => this.handleDrop(room.id)}
                 >
@@ -42,8 +40,7 @@ class Rooms extends React.Component {
                       {room.room}
                     </Typography>
                     <Typography component="p">
-                      This is probably the best room in the platform.  But you'll never
-                      know until you see for yourself.
+                      This is probably the best room.
                     </Typography>
                   </CardContent>
                   <CardActions>

@@ -41098,7 +41098,7 @@ var Users = function Users(props) {
     null,
     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       __WEBPACK_IMPORTED_MODULE_1_material_ui_Paper___default.a,
-      { style: { marginTop: '18px' }, elevation: 4 },
+      { style: { marginTop: '18px', padding: '4px' }, elevation: 4 },
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         __WEBPACK_IMPORTED_MODULE_2_material_ui_Typography___default.a,
         { variant: 'headline', component: 'h3' },
@@ -41111,7 +41111,12 @@ var Users = function Users(props) {
       ),
       users.map(function (user) {
         return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__UserChip__["a" /* default */], { key: user.id, currentUserId: currentUserId, userDragStart: userDragStart, deleteUser: deleteUser, user: user });
-      })
+      }),
+      __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        __WEBPACK_IMPORTED_MODULE_2_material_ui_Typography___default.a,
+        { component: 'p', style: { color: 'red' } },
+        'DRAG and DROP users into the rooms to add!'
+      )
     )
   );
 };
@@ -41254,7 +41259,7 @@ var NewUser = function (_React$Component) {
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         __WEBPACK_IMPORTED_MODULE_2_material_ui_Paper___default.a,
-        { onKeyDown: this.handleKeyDown.bind(this), style: { marginTop: '18px' }, elevation: 4 },
+        { onKeyDown: this.handleKeyDown.bind(this), style: { marginTop: '18px', padding: '4px' }, elevation: 4 },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           __WEBPACK_IMPORTED_MODULE_3_material_ui_Typography___default.a,
           { variant: 'headline', component: 'h3' },
@@ -49251,13 +49256,8 @@ var Rooms = function (_React$Component) {
         null,
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
-          { variant: 'display3', component: 'h2' },
+          { variant: 'display1', component: 'h2' },
           'Rooms'
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
-          { component: 'p', style: { color: 'red' } },
-          'IMPORTANT: You must DRAG and DROP users into the rooms to add!'
         ),
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
           __WEBPACK_IMPORTED_MODULE_6_material_ui_Grid___default.a,
@@ -49269,10 +49269,11 @@ var Rooms = function (_React$Component) {
               { item: true, style: { width: '50%' }, key: room.id },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 __WEBPACK_IMPORTED_MODULE_3_material_ui_Paper___default.a,
-                { style: { backgroundColor: 'lightblue', marginTop: '15px' } },
+                { style: { backgroundColor: 'lightblue', marginTop: '15px', padding: '4px' } },
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                   __WEBPACK_IMPORTED_MODULE_1_material_ui_Card___default.a,
                   {
+                    style: { padding: '8px', minHeight: '240px' },
                     onDragOver: _this2.preventDefault,
                     onDrop: function onDrop() {
                       return _this2.handleDrop(room.id);
@@ -49289,7 +49290,7 @@ var Rooms = function (_React$Component) {
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                       __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
                       { component: 'p' },
-                      'This is probably the best room in the platform.  But you\'ll never know until you see for yourself.'
+                      'This is probably the best room.'
                     )
                   ),
                   __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -49942,7 +49943,7 @@ var UserChip = function UserChip(props) {
       roomId = props.roomId,
       currentUserId = props.currentUserId;
 
-  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_material_ui_Chip___default.a, {
+  return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_material_ui_Chip___default.a, { style: { margin: '4px' },
     avatar: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
       __WEBPACK_IMPORTED_MODULE_1_material_ui_Avatar___default.a,
       null,

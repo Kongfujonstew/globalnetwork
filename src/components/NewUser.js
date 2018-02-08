@@ -31,7 +31,7 @@ class NewUser extends React.Component {
   render() {
     const { title, buttonText } = this.props
     return (
-      <Paper onKeyDown={this.handleKeyDown.bind(this)} style={{marginTop:'18px'}} elevation={4}>
+      <Paper onKeyDown={this.handleKeyDown.bind(this)} style={{marginTop:'18px', padding: '4px'}} elevation={4}>
         <Typography variant="headline" component="h3">
           { title }
         </Typography>

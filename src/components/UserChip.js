@@ -6,7 +6,7 @@ import FaceIcon from 'material-ui-icons/Face';
 const UserChip = (props) => {
   const { user, userDragStart, deleteUser, roomId, currentUserId } = props;
   return (
-    <Chip
+    <Chip style={{margin: '4px'}}
       avatar={
         <Avatar>
           <FaceIcon />
