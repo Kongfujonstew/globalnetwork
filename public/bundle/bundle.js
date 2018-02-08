@@ -7773,11 +7773,20 @@ var Index = function (_React$Component) {
     value: function deleteUser(id) {
       var _this6 = this;
 
+      var rooms = this.state.rooms;
+
       __WEBPACK_IMPORTED_MODULE_4__axios__["a" /* default */].deleteUser(id).then(function (users) {
         return _this6.parseUsers(users.data);
       }).catch(function (err) {
         return console.log('error: ', err);
       });
+      var newRooms = rooms.map(function (room) {
+        room.users = room.users.filter(function (user) {
+          return user.id !== id;
+        });
+        return room;
+      });
+      this.setState({ rooms: newRooms });
     }
   }, {
     key: 'createRoom',
@@ -7791,7 +7800,7 @@ var Index = function (_React$Component) {
     value: function deleteRoom(id) {
       var rooms = this.state.rooms;
       rooms = rooms.filter(function (room) {
-        return room.id !== id;
+        return room.id !== id || room.users.length > 0;
       });
       this.setState({ rooms: rooms });
     }

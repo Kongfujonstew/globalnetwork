@@ -51,9 +51,15 @@ class Index extends React.Component {
   }
 
   deleteUser(id) {
+    const { rooms } = this.state
     asyncActions.deleteUser(id)
       .then(users => this.parseUsers(users.data))
       .catch(err => console.log('error: ', err))
+    const newRooms = rooms.map(room => {
+      room.users = room.users.filter(user => user.id !== id)
+      return room
+    })
+    this.setState({rooms:newRooms})
   }
 
   createRoom(name) {
@@ -64,7 +70,7 @@ class Index extends React.Component {
 
   deleteRoom(id) {
     let rooms = this.state.rooms
-    rooms = rooms.filter(room => room.id !== id)
+    rooms = rooms.filter(room => room.id !== id || room.users.length > 0)
     this.setState({rooms})
   }
 
