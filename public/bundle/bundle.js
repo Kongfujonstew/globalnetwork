@@ -7714,7 +7714,8 @@ var Index = function (_React$Component) {
     _this.state = {
       user: {},
       users: [],
-      rooms: [{ id: 1, room: 'Fun' }, { id: 2, room: 'Sports' }, { id: 3, room: 'Comedy' }, { id: 4, room: 'Travel' }]
+      rooms: [{ id: 1, room: 'Fun', users: [] }, { id: 2, room: 'Sports', users: [] }, { id: 3, room: 'Comedy', users: [] }, { id: 4, room: 'Travel', users: [] }],
+      draggedUserId: null
     };
     return _this;
   }
@@ -7727,7 +7728,6 @@ var Index = function (_React$Component) {
       __WEBPACK_IMPORTED_MODULE_4__axios__["a" /* default */].getUsers().then(function (users) {
         return _this2.setState({ users: users.data });
       });
-      // asyncActions.getRooms().then(rooms => this.setState({rooms: rooms.data}))
     }
   }, {
     key: 'parseUsers',
@@ -7782,17 +7782,87 @@ var Index = function (_React$Component) {
   }, {
     key: 'createRoom',
     value: function createRoom(name) {
-      console.log('createing room: ', name);
       var rooms = this.state.rooms;
-      rooms.push({ id: Math.floor(Math.random() * 1000), room: name });
+      rooms.push({ id: Math.floor(Math.random() * 1000), room: name, users: [] });
       this.setState({ rooms: rooms });
     }
   }, {
+    key: 'deleteRoom',
+    value: function deleteRoom(id) {
+      var rooms = this.state.rooms;
+      rooms = rooms.filter(function (room) {
+        return room.id !== id;
+      });
+      this.setState({ rooms: rooms });
+    }
+  }, {
+    key: 'userDragStart',
+    value: function userDragStart(id) {
+      this.setState({ draggedUserId: id });
+    }
+  }, {
     key: 'addUserToRoom',
-    value: function addUserToRoom(userId, roomName) {}
+    value: function addUserToRoom(id) {
+      var _state = this.state,
+          rooms = _state.rooms,
+          users = _state.users,
+          draggedUserId = _state.draggedUserId;
+
+      var thisUser = users.filter(function (user) {
+        return user.id === draggedUserId;
+      })[0];
+      var newRooms = rooms.map(function (room) {
+        var userExists = false;
+        room.users.map(function (user) {
+          if (user.id === thisUser.id) userExists = true;
+        });
+        if (room.id === id && !userExists) room.users.push(thisUser);
+        return room;
+      });
+      this.setState({ rooms: newRooms });
+    }
+  }, {
+    key: 'addYouToRoom',
+    value: function addYouToRoom(id) {
+      console.log('id: ', id);
+      if (!this.state.user.isAuthenticated) {
+        alert('Please log in to join room!');
+      } else {
+        var _state2 = this.state,
+            rooms = _state2.rooms,
+            users = _state2.users,
+            draggedUserId = _state2.draggedUserId;
+
+        var thisUser = this.state.user;
+        var newRooms = rooms.map(function (room) {
+          var userExists = false;
+          console.log('thisUser: ', thisUser);
+          room.users.map(function (user) {
+            if (user.id === thisUser.id) userExists = true;
+          });
+          if (room.id === id && !userExists) room.users.push(thisUser);
+          return room;
+        });
+        console.log('newRooms: ', newRooms);
+        this.setState({ rooms: newRooms });
+      }
+    }
   }, {
     key: 'deleteUserFromRoom',
-    value: function deleteUserFromRoom(userId, roomId) {}
+    value: function deleteUserFromRoom(userId, roomId) {
+      var rooms = this.state.rooms;
+      var newRooms = rooms.map(function (room) {
+        if (room.id === roomId) {
+          room.users = room.users.filter(function (user) {
+            return user.id !== userId;
+          });
+          return room;
+        } else {
+          return room;
+        }
+      });
+      this.setState({ rooms: newRooms });
+    }
   }, {
     key: 'logout',
     value: function logout() {
@@ -7832,12 +7902,12 @@ var Index = function (_React$Component) {
               __WEBPACK_IMPORTED_MODULE_7_material_ui_Grid___default.a,
               { item: true, sm: 10 },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_9__components_Users__["a" /* default */], {
-                deleteUser: this.deleteUser.bind(this),
-                users: this.state.users
+                users: this.state.users,
+                userDragStart: this.userDragStart.bind(this),
+                deleteUser: this.deleteUser.bind(this)
               })
             )
           ),
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_10__components_NewUser__["a" /* default */], { title: 'Create a new group.', buttonText: 'Create group', createUser: this.createRoom.bind(this) }),
           __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
             __WEBPACK_IMPORTED_MODULE_7_material_ui_Grid___default.a,
             { container: true },
@@ -7847,8 +7917,23 @@ var Index = function (_React$Component) {
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_11__components_Rooms__["a" /* default */], {
                 users: this.state.users,
                 rooms: this.state.rooms,
-                deleteUser: this.deleteUser.bind(this)
+                currentUserId: this.state.user.id,
+                addUserToRoom: this.addUserToRoom.bind(this),
+                addYouToRoom: this.addYouToRoom.bind(this),
+                deleteRoom: this.deleteRoom.bind(this),
+                deleteUserFromRoom: this.deleteUserFromRoom.bind(this),
+                deleteUser: this.deleteUser.bind(this),
+                userDragStart: this.userDragStart.bind(this)
               })
+            )
+          ),
+          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+            __WEBPACK_IMPORTED_MODULE_7_material_ui_Grid___default.a,
+            { container: true },
+            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              __WEBPACK_IMPORTED_MODULE_7_material_ui_Grid___default.a,
+              { item: true, sm: 10 },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_10__components_NewUser__["a" /* default */], { title: 'Create a new room.', buttonText: 'Create group', createUser: this.createRoom.bind(this) })
             )
           )
         )
@@ -33699,29 +33784,10 @@ var deleteUser = function deleteUser(id) {
   });
 };
 
-// const getRooms = () => {
-//   return axios.get(url + 'rooms' , {
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//     .then(rooms => rooms)
-//     .catch(err => console.log('err: ', err))
-// }
-
-// const createRoom = (name) => {
-//   return axios.post(url + 'rooms' , {
-//     headers: { 'Content-Type': 'application/json' },
-//     name
-//   })
-//     .then(rooms => rooms)
-//     .catch(err => console.log('err: ', err))
-// }
-
 /* harmony default export */ __webpack_exports__["a"] = ({
   createAndLoginUser: createAndLoginUser,
-  // createRoom,
   deleteUser: deleteUser,
   getUsers: getUsers,
-  // getRooms,
   makeUser: makeUser
 });
 
@@ -41023,7 +41089,9 @@ exports.default = Menu;
 
 var Users = function Users(props) {
   var users = props.users,
-      deleteUser = props.deleteUser;
+      userDragStart = props.userDragStart,
+      deleteUser = props.deleteUser,
+      currentUserId = props.currentUserId;
 
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
     'div',
@@ -41042,7 +41110,7 @@ var Users = function Users(props) {
         'Click on someone to delete them.'
       ),
       users.map(function (user) {
-        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__UserChip__["a" /* default */], { key: user.id, deleteUser: deleteUser, user: user });
+        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__UserChip__["a" /* default */], { key: user.id, currentUserId: currentUserId, userDragStart: userDragStart, deleteUser: deleteUser, user: user });
       })
     )
   );
@@ -49127,6 +49195,8 @@ exports.default = (0, _withStyles2.default)(styles, { name: 'MuiListSubheader' }
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography__ = __webpack_require__(351);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_material_ui_Typography__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__UserChip__ = __webpack_require__(445);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_material_ui_Grid__ = __webpack_require__(325);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_material_ui_Grid___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_material_ui_Grid__);
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -49134,6 +49204,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 
 
 
@@ -49158,10 +49229,8 @@ var Rooms = function (_React$Component) {
     }
   }, {
     key: 'handleDrop',
-    value: function handleDrop(e) {
-      var data = e.dataTransfer;
-      e.preventDefault();
-      console.log('d: ', data);
+    value: function handleDrop(roomName) {
+      this.props.addUserToRoom(roomName);
     }
   }, {
     key: 'render',
@@ -49170,7 +49239,12 @@ var Rooms = function (_React$Component) {
 
       var _props = this.props,
           rooms = _props.rooms,
-          deleteUser = _props.deleteUser;
+          addYouToRoom = _props.addYouToRoom,
+          deleteUserFromRoom = _props.deleteUserFromRoom,
+          deleteRoom = _props.deleteRoom,
+          deleteUser = _props.deleteUser,
+          userDragStart = _props.userDragStart,
+          currentUserId = _props.currentUserId;
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
@@ -49180,56 +49254,88 @@ var Rooms = function (_React$Component) {
           { variant: 'display3', component: 'h2' },
           'Rooms'
         ),
-        rooms.map(function (room) {
-          var users = room.users || [];
-          return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            __WEBPACK_IMPORTED_MODULE_3_material_ui_Paper___default.a,
-            { style: { backgroundColor: 'lightblue', marginTop: '15px' }, key: room.id },
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              __WEBPACK_IMPORTED_MODULE_1_material_ui_Card___default.a,
-              {
-                onDragOver: _this2.preventDefault,
-                onDrop: _this2.handleDrop
-              },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
+          { component: 'p', style: { color: 'red' } },
+          'IMPORTANT: You must DRAG and DROP users into the rooms to add!'
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+          __WEBPACK_IMPORTED_MODULE_6_material_ui_Grid___default.a,
+          { container: true },
+          rooms.map(function (room) {
+            var users = room.users || [];
+            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+              __WEBPACK_IMPORTED_MODULE_6_material_ui_Grid___default.a,
+              { item: true, style: { width: '50%' }, key: room.id },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                __WEBPACK_IMPORTED_MODULE_1_material_ui_Card__["CardContent"],
-                null,
+                __WEBPACK_IMPORTED_MODULE_3_material_ui_Paper___default.a,
+                { style: { backgroundColor: 'lightblue', marginTop: '15px' } },
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                  __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
-                  { variant: 'headline', component: 'h2' },
-                  room.room
-                ),
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                  __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
-                  { component: 'p' },
-                  'This is probably the best room in the platform.  But you\'ll never know until you see for yourself.'
+                  __WEBPACK_IMPORTED_MODULE_1_material_ui_Card___default.a,
+                  {
+                    onDragOver: _this2.preventDefault,
+                    onDrop: function onDrop() {
+                      return _this2.handleDrop(room.id);
+                    }
+                  },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    __WEBPACK_IMPORTED_MODULE_1_material_ui_Card__["CardContent"],
+                    null,
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                      __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
+                      { variant: 'headline', component: 'h2' },
+                      room.room
+                    ),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                      __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
+                      { component: 'p' },
+                      'This is probably the best room in the platform.  But you\'ll never know until you see for yourself.'
+                    )
+                  ),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    __WEBPACK_IMPORTED_MODULE_1_material_ui_Card__["CardActions"],
+                    null,
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                      __WEBPACK_IMPORTED_MODULE_2_material_ui_Button___default.a,
+                      {
+                        size: 'small',
+                        color: 'primary',
+                        onClick: function onClick() {
+                          return addYouToRoom(room.id);
+                        }
+                      },
+                      'Join'
+                    ),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                      __WEBPACK_IMPORTED_MODULE_2_material_ui_Button___default.a,
+                      { size: 'small', color: 'primary' },
+                      'Learn More'
+                    ),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                      __WEBPACK_IMPORTED_MODULE_2_material_ui_Button___default.a,
+                      {
+                        size: 'small',
+                        color: 'primary',
+                        onClick: function onClick() {
+                          return deleteRoom(room.id);
+                        }
+                      },
+                      'Delete this room'
+                    )
+                  ),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
+                    { component: 'p' },
+                    'Members:'
+                  ),
+                  users.map(function (user) {
+                    return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__UserChip__["a" /* default */], { key: user.id, currentUserId: currentUserId, roomId: room.id, userDragStart: userDragStart, deleteUser: deleteUserFromRoom, user: user });
+                  })
                 )
-              ),
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                __WEBPACK_IMPORTED_MODULE_1_material_ui_Card__["CardActions"],
-                null,
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                  __WEBPACK_IMPORTED_MODULE_2_material_ui_Button___default.a,
-                  { size: 'small', color: 'primary' },
-                  'Join'
-                ),
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                  __WEBPACK_IMPORTED_MODULE_2_material_ui_Button___default.a,
-                  { size: 'small', color: 'primary' },
-                  'Learn More'
-                )
-              ),
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                __WEBPACK_IMPORTED_MODULE_4_material_ui_Typography___default.a,
-                { component: 'p' },
-                'Members:'
-              ),
-              users.map(function (user) {
-                return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_5__UserChip__["a" /* default */], { key: user.id, deleteUser: deleteUser, user: user });
-              })
-            )
-          );
-        })
+              )
+            );
+          })
+        )
       );
     }
   }]);
@@ -49831,7 +49937,10 @@ exports.default = (0, _withStyles2.default)(styles, { name: 'MuiCardHeader' })(C
 
 var UserChip = function UserChip(props) {
   var user = props.user,
-      deleteUser = props.deleteUser;
+      userDragStart = props.userDragStart,
+      deleteUser = props.deleteUser,
+      roomId = props.roomId,
+      currentUserId = props.currentUserId;
 
   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2_material_ui_Chip___default.a, {
     avatar: __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -49840,10 +49949,13 @@ var UserChip = function UserChip(props) {
       __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3_material_ui_icons_Face___default.a, null)
     ),
     draggable: true,
-    label: user.name,
+    onDragStart: function onDragStart() {
+      return userDragStart(user.id);
+    },
+    label: user.id === currentUserId ? 'ME' : user.name,
     onClick: function onClick() {},
     onDelete: function onDelete() {
-      return deleteUser(user.id);
+      return deleteUser(user.id, roomId);
     }
   });
 };

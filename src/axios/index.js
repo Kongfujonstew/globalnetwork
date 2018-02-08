@@ -29,28 +29,9 @@ const deleteUser = (id) => {
   })
 }
 
-// const getRooms = () => {
-//   return axios.get(url + 'rooms' , {
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//     .then(rooms => rooms)
-//     .catch(err => console.log('err: ', err))
-// }
-
-// const createRoom = (name) => {
-//   return axios.post(url + 'rooms' , {
-//     headers: { 'Content-Type': 'application/json' },
-//     name
-//   })
-//     .then(rooms => rooms)
-//     .catch(err => console.log('err: ', err))
-// }
-
 export default {
   createAndLoginUser,
-  // createRoom,
   deleteUser,
   getUsers,
-  // getRooms,
   makeUser
 }

@@ -4,7 +4,7 @@ import Chip from 'material-ui/Chip'
 import FaceIcon from 'material-ui-icons/Face';
 
 const UserChip = (props) => {
-  const { user, deleteUser } = props;
+  const { user, userDragStart, deleteUser, roomId, currentUserId } = props;
   return (
     <Chip
       avatar={
@@ -13,9 +13,10 @@ const UserChip = (props) => {
         </Avatar>
       }
       draggable
-      label={user.name}
+      onDragStart={() => userDragStart(user.id)}
+      label={user.id === currentUserId ? 'ME' : user.name}
       onClick={() => {}}
-      onDelete={() => deleteUser(user.id)}
+      onDelete={() => deleteUser(user.id, roomId)}
     />
   )
 }

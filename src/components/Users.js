@@ -4,7 +4,7 @@ import Typography from 'material-ui/Typography'
 import UserChip from './UserChip'
 
 const Users = (props) => {
-  const { users, deleteUser } = props;
+  const { users, userDragStart, deleteUser, currentUserId } = props;
   return (
     <div>
       <Paper style={{marginTop:'18px'}} elevation={4}>
@@ -14,7 +14,7 @@ const Users = (props) => {
         <Typography component="p">
           Click on someone to delete them.
         </Typography>
-        { users.map(user => <UserChip key={user.id} deleteUser={deleteUser} user={user} />) }
+        { users.map(user => <UserChip key={user.id} currentUserId={currentUserId} userDragStart={userDragStart} deleteUser={deleteUser} user={user} />) }
       </Paper>
     </div>
   );

@@ -4,6 +4,7 @@ import Button from 'material-ui/Button'
 import Paper from 'material-ui/Paper'
 import Typography from 'material-ui/Typography'
 import UserChip from './UserChip'
+import Grid from 'material-ui/Grid'
 
 class Rooms extends React.Component {
 
@@ -11,54 +12,70 @@ class Rooms extends React.Component {
     e.preventDefault()
   }
 
-  handleDrop(e) {
-    const data = e.dataTransfer;
-    e.preventDefault()
-    console.log('d: ', data)
+  handleDrop(roomName) {
+    this.props.addUserToRoom(roomName)
   }
 
 
   render () {
-  const { rooms, deleteUser } = this.props
+  const { rooms, addYouToRoom, deleteUserFromRoom, deleteRoom, deleteUser, userDragStart, currentUserId } = this.props
     return (
       <div>
         <Typography variant="display3" component="h2">
           Rooms
         </Typography>
+        <Typography component="p" style={{color:'red'}}>
+          IMPORTANT: You must DRAG and DROP users into the rooms to add!
+        </Typography>
+        <Grid container>
         { rooms.map(room => {
           const users = room.users || []
           return (
-            <Paper style={{backgroundColor: 'lightblue', marginTop: '15px'}} key={room.id}>
-              <Card
-                onDragOver={this.preventDefault}
-                onDrop={this.handleDrop}
-              >
-                <CardContent>
-                  <Typography variant="headline" component="h2">
-                    {room.room}
-                  </Typography>
+            <Grid item style={{width: '50%'}} key={room.id}>
+              <Paper style={{backgroundColor: 'lightblue', marginTop: '15px'}}>
+                <Card
+                  onDragOver={this.preventDefault}
+                  onDrop={() => this.handleDrop(room.id)}
+                >
+                  <CardContent>
+                    <Typography variant="headline" component="h2">
+                      {room.room}
+                    </Typography>
+                    <Typography component="p">
+                      This is probably the best room in the platform.  But you'll never
+                      know until you see for yourself.
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button
+                      size="small"
+                      color="primary"
+                      onClick={() => addYouToRoom(room.id)}
+                    >
+                      Join
+                    </Button>
+                    <Button size="small" color="primary">
+                      Learn More
+                    </Button>
+                    <Button 
+                      size="small"
+                      color="primary"
+                      onClick={() => deleteRoom(room.id)}
+                    >
+                      Delete this room
+                    </Button>
+                  </CardActions>
                   <Typography component="p">
-                    This is probably the best room in the platform.  But you'll never
-                    know until you see for yourself.
+                    Members:
                   </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button size="small" color="primary">
-                    Join
-                  </Button>
-                  <Button size="small" color="primary">
-                    Learn More
-                  </Button>
-                </CardActions>
-                <Typography component="p">
-                  Members:
-                </Typography>
-                { users.map(user => <UserChip key={user.id} deleteUser={deleteUser} user={user} />) }
-              </Card>
-            </Paper>
+                  { users.map(user => <UserChip key={user.id} currentUserId={currentUserId} roomId={room.id} userDragStart={userDragStart} deleteUser={deleteUserFromRoom} user={user} />) }
+                </Card>
+              </Paper>
+            </Grid>
           )
         })
       }
+        </Grid>
       </div>
     );
   }

@@ -17,13 +17,13 @@ class Index extends React.Component {
     this.state = {
       user: {},
       users: [],
-      rooms: [{id:1, room:'Fun'}, {id:2, room:'Sports'}, {id:3, room:'Comedy'}, {id:4, room:'Travel'}]
+      rooms: [{id:1, room:'Fun', users:[]}, {id:2, room:'Sports', users:[]}, {id:3, room:'Comedy', users:[]}, {id:4, room:'Travel', users:[]}],
+      draggedUserId: null
     }
   }
 
   componentDidMount() {
     asyncActions.getUsers().then(users => this.setState({users: users.data}))
-    // asyncActions.getRooms().then(rooms => this.setState({rooms: rooms.data}))
   }
 
   parseUsers(usersArray) {
@@ -57,18 +57,63 @@ class Index extends React.Component {
   }
 
   createRoom(name) {
-    console.log('createing room: ', name)
     const rooms = this.state.rooms
-    rooms.push({id:Math.floor(Math.random()*1000), room:name})
+    rooms.push({id:Math.floor(Math.random()*1000), room:name, users:[]})
     this.setState({rooms})
   }
 
-  addUserToRoom(userId, roomName) {
+  deleteRoom(id) {
+    let rooms = this.state.rooms
+    rooms = rooms.filter(room => room.id !== id)
+    this.setState({rooms})
+  }
 
+  userDragStart(id) {
+    this.setState({draggedUserId: id})
+  }
+
+  addUserToRoom(id) {
+    const { rooms, users, draggedUserId } = this.state
+    const thisUser = users.filter(user => user.id === draggedUserId)[0]
+    const newRooms = rooms.map(room => {
+      let userExists = false
+      room.users.map(user => {if (user.id === thisUser.id) userExists = true})
+      if (room.id === id && !userExists) room.users.push(thisUser)
+      return room
+    })
+    this.setState({rooms:newRooms})
+  }
+
+  addYouToRoom(id) {
+    console.log('id: ', id)
+    if (!this.state.user.isAuthenticated) {
+      alert('Please log in to join room!')
+    } else {
+      const { rooms, users, draggedUserId } = this.state
+      const thisUser = this.state.user
+      const newRooms = rooms.map(room => {
+        let userExists = false
+        console.log('thisUser: ', thisUser)
+        room.users.map(user => {if (user.id === thisUser.id) userExists = true})
+        if (room.id === id && !userExists) room.users.push(thisUser)
+        return room
+      })
+      console.log('newRooms: ', newRooms)
+      this.setState({rooms:newRooms})
+    }
   }
 
   deleteUserFromRoom(userId, roomId) {
-
+    const rooms = this.state.rooms
+    const newRooms = rooms.map(room => {
+      if (room.id === roomId) {
+        room.users = room.users.filter(user => user.id !== userId)
+        return room
+      } else { 
+        return room
+      }
+    })
+    this.setState({rooms:newRooms})
   }
 
   logout() {
@@ -97,19 +142,30 @@ class Index extends React.Component {
           <Grid container>
             <Grid item sm={10}>
               <Users
-                deleteUser={this.deleteUser.bind(this)}
                 users={this.state.users}
+                userDragStart={this.userDragStart.bind(this)}
+                deleteUser={this.deleteUser.bind(this)}
               />
             </Grid>
           </Grid>
-          <NewUser title={'Create a new group.'} buttonText={'Create group'} createUser={this.createRoom.bind(this)}/>
           <Grid container>
             <Grid item sm={10}>
               <Rooms 
                 users={this.state.users}
                 rooms={this.state.rooms}
+                currentUserId={this.state.user.id}
+                addUserToRoom={this.addUserToRoom.bind(this)}
+                addYouToRoom={this.addYouToRoom.bind(this)}
+                deleteRoom={this.deleteRoom.bind(this)}
+                deleteUserFromRoom={this.deleteUserFromRoom.bind(this)}
                 deleteUser={this.deleteUser.bind(this)}
+                userDragStart={this.userDragStart.bind(this)}
               />
+            </Grid>
+          </Grid>
+          <Grid container>
+            <Grid item sm={10}>          
+              <NewUser title={'Create a new room.'} buttonText={'Create group'} createUser={this.createRoom.bind(this)}/>
             </Grid>
           </Grid>
         </main>
